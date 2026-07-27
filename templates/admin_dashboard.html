@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
+</head>
+<body>
+    <div class="header">
+        <h1>Admin Dashboard — Welcome, {{ name }}</h1>
+        <a class="logout" href="/logout">Log out</a>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card"><div class="stat-number">{{ student_count }}</div><div class="stat-label">Students</div></div>
+        <div class="stat-card"><div class="stat-number">{{ teacher_count }}</div><div class="stat-label">Teachers</div></div>
+        <div class="stat-card"><div class="stat-number">{{ class_count }}</div><div class="stat-label">Classes</div></div>
+        <div class="stat-card"><div class="stat-number">{{ subject_count }}</div><div class="stat-label">Subjects</div></div>
+    </div>
+
+    <div class="nav-grid">
+        <a class="nav-card" href="/admin/classes">
+            <h3>📚 Manage Classes</h3>
+            <p>Add or view classes (e.g. TYBSC CS, TYBSC IT)</p>
+        </a>
+        <a class="nav-card" href="/admin/subjects">
+            <h3>📖 Manage Subjects</h3>
+            <p>Add subjects and assign them to a class + teacher</p>
+        </a>
+        <a class="nav-card" href="/admin/users">
+            <h3>👤 Manage Users</h3>
+            <p>Add students, teachers, or admins; enroll students in a class</p>
+        </a>
+        <a class="nav-card" href="/admin/defaulters">
+            <h3>⚠️ Defaulter Report</h3>
+            <p>Students below 75% attendance in any subject</p>
+        </a>
+        <a class="nav-card" href="/admin/export/attendance.csv">
+            <h3>⬇️ Export Attendance CSV</h3>
+            <p>Full attendance data for every student and subject</p>
+        </a>
+        <a class="nav-card" href="/admin/settings">
+            <h3>📍 Campus Location Settings</h3>
+            <p>Restrict QR scans to on-campus, to block off-campus proxy scans</p>
+        </a>
+    </div>
+</body>
+</html>

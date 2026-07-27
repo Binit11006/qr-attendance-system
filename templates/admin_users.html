@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Users</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_users.css') }}">
+</head>
+<body>
+    <div class="header">
+        <h1>Manage Users</h1>
+        <a class="back" href="/admin/dashboard">← Back to Dashboard</a>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for m in messages %}<div class="flash">{{ m }}</div>{% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card">
+        <h3>Add a New User</h3>
+        <form method="POST">
+            <input type="text" name="college_id" placeholder="College ID (e.g. STU010)" required>
+            <input type="text" name="name" placeholder="Full name" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="text" name="password" placeholder="Password" required>
+            <select name="role" id="role-select" required>
+                <option value="">Select role...</option>
+                <option value="student">Student</option>
+                <option value="teacher">Teacher</option>
+                <option value="admin">Admin</option>
+            </select>
+            <span id="class-field">
+                <input type="number" name="roll_no" placeholder="Roll No" min="1" style="width: 80px;">
+                <select name="class_id">
+                    <option value="">Enroll in class...</option>
+                    {% for c in classes %}
+                    <option value="{{ c.id }}">{{ c.name }}</option>
+                    {% endfor %}
+                </select>
+            </span>
+            <br>
+            <button type="submit">Add User</button>
+        </form>
+    <script src="{{ url_for('static', filename='js/admin_users.js') }}"></script>
+    </div>
+
+    <table>
+        <tr><th>Roll No</th><th>College ID</th><th>Name</th><th>Email</th><th>Role</th><th>Class</th><th></th></tr>
+        {% for u in users %}
+        <tr>
+            <td>{{ u.roll_no or '—' }}</td>
+            <td>{{ u.college_id }}</td>
+            <td>{{ u.name }}</td>
+            <td>{{ u.email }}</td>
+            <td><span class="role-tag role-{{ u.role }}">{{ u.role }}</span></td>
+            <td>{{ u.class_names or '—' }}</td>
+            <td>
+                <form method="POST" action="/admin/users/{{ u.id }}/delete"
+                      onsubmit="return confirm(
+                        {% if u.role == 'teacher' %}
+                        'Delete {{ u.name }}? They teach {{ u.subject_count }} subject(s) — deleting them will PERMANENTLY delete all of those subjects, every QR session, and every attendance record tied to them. This cannot be undone.'
+                        {% elif u.role == 'student' %}
+                        'Delete {{ u.name }}? This will permanently remove their {{ u.attendance_count }} attendance record(s) and class enrollment. This cannot be undone.'
+                        {% else %}
+                        'Delete admin {{ u.name }}? This cannot be undone.'
+                        {% endif %}
+                      );">
+                    <button type="submit" style="background: #dc2626; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem;">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

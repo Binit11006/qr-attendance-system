@@ -1,0 +1,14 @@
+        body { font-family: system-ui, sans-serif; background: #f4f6f8; margin: 0; padding: 2rem; }
+        .header { display: flex; justify-content: space-between; align-items: center;
+                   background: white; padding: 1rem 1.5rem; border-radius: 8px;
+                   box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 1.5rem; }
+        h1 { font-size: 1.1rem; margin: 0; color: #1a1a1a; }
+        a.logout { color: #2563eb; text-decoration: none; font-size: 0.9rem; }
+        .card { background: white; padding: 1.5rem; border-radius: 8px;
+                 box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        select { padding: 0.6rem; border-radius: 6px; border: 1px solid #ddd; margin-right: 0.5rem; }
+        button { padding: 0.6rem 1.2rem; background: #2563eb; color: white;
+                 border: none; border-radius: 6px; cursor: pointer; }
+        button:hover { background: #1d4ed8; }
+        .empty { color: #888; }
+    

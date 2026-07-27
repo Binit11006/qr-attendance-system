@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Live Session QR</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/session_live.css') }}">
+</head>
+<body>
+    <div class="card">
+        <h2>Scan to Mark Attendance</h2>
+        <img id="qr-img" src="/teacher/session/{{ session_id }}/qr.png?t=0" alt="QR Code">
+        <div class="timer">Refreshes in <span id="countdown">{{ qr_valid_seconds }}</span>s</div>
+        <p class="hint">This QR code refreshes automatically so it can't be reused after this window closes.</p>
+        <form method="POST" action="/teacher/session/{{ session_id }}/end"
+              onsubmit="return confirm('End this session? Students won\'t be able to scan anymore.');">
+            <button type="submit" class="end-btn">End Session</button>
+        </form>
+    </div>
+
+    <script>
+        // Small bridge: pass server-side (Jinja) values to the static JS file.
+        // The static file can't read Jinja variables directly, so we set them
+        // as globals here, then session_live.js does all the real logic.
+        const SESSION_ID = {{ session_id }};
+        const QR_VALID_SECONDS = {{ qr_valid_seconds }};
+    </script>
+    <script src="{{ url_for('static', filename='js/session_live.js') }}"></script>
+</body>
+</html>

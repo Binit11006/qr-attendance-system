@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login — Smart Attendance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+<body>
+    <div class="card">
+        <h1>Smart Attendance Login</h1>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for m in messages %}<div class="flash">{{ m }}</div>{% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form method="POST">
+            <label for="college_id">College ID</label>
+            <input type="text" id="college_id" name="college_id" required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="submit">Log In</button>
+        </form>
+    </div>
+</body>
+</html>

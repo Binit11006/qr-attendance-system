@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Session Attendance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/session_attendance.css') }}">
+</head>
+<body>
+    <div class="header">
+        <h1>{{ session.subject_name }} — {{ session.session_date }}</h1>
+        <a class="back" href="/teacher/dashboard">← Back to Dashboard</a>
+    </div>
+
+    <form method="POST">
+        <table>
+            <tr>
+                <th>Present?</th>
+                <th>Roll No</th>
+                <th>Name</th>
+                <th>College ID</th>
+                <th>Current Status</th>
+            </tr>
+            {% for student in roster %}
+            <tr>
+                <td>
+                    <input type="checkbox" name="present" value="{{ student.id }}"
+                           {% if student.status %}checked{% endif %}>
+                </td>
+                <td>{{ student.roll_no or '—' }}</td>
+                <td>{{ student.name }}</td>
+                <td>{{ student.college_id }}</td>
+                <td>
+                    {% if student.status %}
+                    <span class="status-tag present">Present</span>
+                    {% else %}
+                    <span class="status-tag absent">Absent</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <p class="hint">Check a box to mark present, uncheck to mark absent. This overrides self-scanned attendance too.</p>
+        <button type="submit">Save Changes</button>
+    </form>
+</body>
+</html>

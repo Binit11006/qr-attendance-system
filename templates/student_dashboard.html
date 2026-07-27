@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/student_dashboard.css') }}">
+</head>
+<body>
+    <div class="header">
+        <h1>Student Dashboard — Welcome, {{ name }}</h1>
+        <a class="logout" href="/logout">Log out</a>
+    </div>
+
+    <div class="card">
+        <h3>Mark Your Attendance</h3>
+        <p>Scan the QR code your teacher is currently showing in class.</p>
+        <a class="scan-btn" href="/student/scan">📷 Scan QR Code</a>
+    </div>
+
+    <h3>Your Attendance</h3>
+    {% if subjects %}
+    <table>
+        <tr><th>Subject</th><th>Attended</th><th>Total Lectures</th><th>Percentage</th><th>Status</th></tr>
+        {% for s in subjects %}
+        <tr>
+            <td>{{ s.name }}</td>
+            <td>{{ s.attended }}</td>
+            <td>{{ s.total }}</td>
+            <td>{{ s.pct }}%</td>
+            <td><span class="badge" style="background: {{ s.color }};">{{ s.label }}</span></td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <div class="empty">No subjects found for your class yet.</div>
+    {% endif %}
+</body>
+</html>

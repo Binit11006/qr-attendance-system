@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ class_name }} — Attendance Report</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/class_head_report.css') }}">
+</head>
+<body>
+    <div class="header">
+        <h1>{{ class_name }} — Attendance Report (Class Head View)</h1>
+        <div class="actions">
+            <a href="/teacher/class-report/{{ class_id }}/export.xlsx?view={{ view }}">⬇️ Export Excel</a>
+            <button onclick="window.print()">🖨️ Print</button>
+            <a href="/teacher/dashboard">← Back to Dashboard</a>
+        </div>
+    </div>
+
+    <div class="note">View-only — this report cannot be edited from here. To correct attendance for a specific lecture, use "Edit Attendance" on that session from the Teacher Dashboard.</div>
+
+    <div class="toggle-bar">
+        <a href="/teacher/class-report/{{ class_id }}?view=all" class="{{ 'active' if view == 'all' else '' }}">All Subjects</a>
+        <a href="/teacher/class-report/{{ class_id }}?view=theory" class="{{ 'active' if view == 'theory' else '' }}">Theory Only</a>
+        <a href="/teacher/class-report/{{ class_id }}?view=practical" class="{{ 'active' if view == 'practical' else '' }}">Practical Only</a>
+    </div>
+
+    {% if subjects %}
+    <div class="table-wrap">
+    <table>
+        <tr>
+            <th class="name-col" rowspan="2">Roll No</th>
+            <th class="name-col" rowspan="2">Name of the Student</th>
+            {% for sub in subjects %}
+            <th class="subject-group-header" colspan="3">{{ sub.name }}</th>
+            {% endfor %}
+            <th class="total-group-header" colspan="3">Total Attendance</th>
+        </tr>
+        <tr>
+            {% for sub in subjects %}
+            <th>Att</th><th>Mv</th><th>%</th>
+            {% endfor %}
+            <th>Att</th><th>Mv</th><th>%</th>
+        </tr>
+        {% for r in report %}
+        <tr>
+            <td class="name-col">{{ r.roll_no or '—' }}</td>
+            <td class="name-col">{{ r.name }}</td>
+            {% for cell in r.subjects %}
+            <td>{{ cell.attended }}</td>
+            <td>{{ cell.total }}</td>
+            <td class="pct-cell" style="color: {{ '#991b1b' if cell.pct is not none and cell.pct < 75 else '#166534' }};">
+                {{ cell.pct if cell.pct is not none else '—' }}{{ '%' if cell.pct is not none else '' }}
+            </td>
+            {% endfor %}
+            <td class="total-group">{{ r.total_attended }}</td>
+            <td class="total-group">{{ r.total_sessions }}</td>
+            <td class="total-group pct-cell" style="color: {{ r.color }};">{{ r.overall_pct }}%</td>
+        </tr>
+        {% endfor %}
+    </table>
+    </div>
+    {% else %}
+    <div class="empty">No {{ view }} subjects found for this class.</div>
+    {% endif %}
+</body>
+</html>

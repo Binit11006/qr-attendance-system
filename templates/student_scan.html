@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Scan QR Code</title>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/student_scan.css') }}">
+</head>
+<body>
+    <div class="card">
+        <h2>Scan Attendance QR</h2>
+        <div id="reader"></div>
+        <div id="result"></div>
+        <div class="location-status" id="location-status">📍 Getting your location…</div>
+        <a class="back-link" href="/student/dashboard">← Back to Dashboard</a>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/student_scan.js') }}"></script>
+</body>
+</html>

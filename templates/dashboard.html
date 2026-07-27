@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ role }} Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+<body>
+    <div class="header">
+        <h1>{{ role }} Dashboard — Welcome, {{ name }}</h1>
+        <a class="logout" href="/logout">Log out</a>
+    </div>
+    <div class="placeholder">
+        Week 1 checkpoint: login and role routing are working.<br>
+        {{ role }}-specific features (QR generation / scanning / reports) get built in Weeks 2–5.
+    </div>
+</body>
+</html>

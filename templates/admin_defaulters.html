@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Defaulter Report</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_defaulters.css') }}">
+</head>
+<body>
+    <div class="header">
+        <h1>Defaulter Report — Below 75% Attendance</h1>
+        <a class="back" href="/admin/dashboard">← Back to Dashboard</a>
+    </div>
+
+    <div class="filter-card">
+        <form method="GET">
+            <select name="class_id">
+                <option value="">All Classes</option>
+                {% for c in classes %}
+                <option value="{{ c.id }}" {% if selected_class|string == c.id|string %}selected{% endif %}>{{ c.name }}</option>
+                {% endfor %}
+            </select>
+            <select name="month">
+                <option value="">All Months</option>
+                {% for m in range(1, 13) %}
+                <option value="{{ m }}" {% if selected_month|string == m|string %}selected{% endif %}>
+                    {{ ['January','February','March','April','May','June','July','August','September','October','November','December'][m-1] }}
+                </option>
+                {% endfor %}
+            </select>
+            <select name="year">
+                <option value="">All Years</option>
+                {% for y in range(2024, 2028) %}
+                <option value="{{ y }}" {% if selected_year|string == y|string %}selected{% endif %}>{{ y }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Filter</button>
+            {% if selected_class or selected_month or selected_year %}
+            <a class="clear" href="/admin/defaulters">Clear filters</a>
+            {% endif %}
+        </form>
+    </div>
+
+    {% if defaulters %}
+    <table>
+        <tr>
+            <th>Roll No</th><th>Student</th><th>College ID</th><th>Class</th><th>Subject</th>
+            <th>Attended / Total</th><th>Percentage</th>
+        </tr>
+        {% for d in defaulters %}
+        <tr>
+            <td>{{ d.roll_no or '—' }}</td>
+            <td>{{ d.student_name }}</td>
+            <td>{{ d.college_id }}</td>
+            <td>{{ d.class_name }}</td>
+            <td>{{ d.subject_name }}</td>
+            <td>{{ d.attended }} / {{ d.total_sessions }}</td>
+            <td class="pct">{{ d.pct }}%</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <div class="empty">No defaulters found — either everyone's above 75%, or no sessions have been held yet.</div>
+    {% endif %}
+</body>
+</html>

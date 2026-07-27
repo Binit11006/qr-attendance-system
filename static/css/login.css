@@ -1,0 +1,14 @@
+        body { font-family: system-ui, sans-serif; background: #f4f6f8; display: flex;
+               align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 2.5rem; border-radius: 10px;
+                box-shadow: 0 4px 16px rgba(0,0,0,0.08); width: 320px; }
+        h1 { font-size: 1.3rem; margin-bottom: 1.5rem; color: #1a1a1a; }
+        label { font-size: 0.85rem; color: #555; }
+        input { width: 100%; padding: 0.6rem; margin: 0.3rem 0 1rem 0;
+                border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 0.7rem; background: #2563eb; color: white;
+                 border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; }
+        button:hover { background: #1d4ed8; }
+        .flash { background: #fee2e2; color: #991b1b; padding: 0.6rem;
+                 border-radius: 6px; margin-bottom: 1rem; font-size: 0.85rem; }
+    

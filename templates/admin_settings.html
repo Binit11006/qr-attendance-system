@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Settings</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_settings.css') }}">
+</head>
+<body>
+    <div class="header">
+        <h1>Campus Location Settings</h1>
+        <a class="back" href="/admin/dashboard">← Back to Dashboard</a>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for m in messages %}<div class="flash">{{ m }}</div>{% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% if settings.campus_lat and settings.campus_lng %}
+    <div class="status-on">✅ Geofencing is ON — students must be within {{ settings.campus_radius_meters }}m of campus to mark attendance.</div>
+    {% else %}
+    <div class="status-off">⚠️ Geofencing is OFF — students can mark attendance from anywhere. Set campus coordinates below to turn it on.</div>
+    {% endif %}
+
+    <div class="card">
+        <h3>Campus Coordinates</h3>
+        <p class="hint">Stand on campus and click "Use My Current Location," or look up your campus's coordinates on Google Maps (right-click the location → the numbers shown are latitude, longitude).</p>
+        <button type="button" class="locate-btn" onclick="useMyLocation()">📍 Use My Current Location</button>
+        <span id="locate-status" class="hint"></span>
+
+        <form method="POST">
+            <label for="campus_lat">Latitude</label>
+            <input type="text" id="campus_lat" name="campus_lat" value="{{ settings.campus_lat or '' }}" placeholder="e.g. 19.2183">
+
+            <label for="campus_lng">Longitude</label>
+            <input type="text" id="campus_lng" name="campus_lng" value="{{ settings.campus_lng or '' }}" placeholder="e.g. 72.8493">
+
+            <label for="campus_radius_meters">Allowed Radius (meters)</label>
+            <input type="number" id="campus_radius_meters" name="campus_radius_meters" value="{{ settings.campus_radius_meters or 200 }}" min="20">
+            <p class="hint">200m is a reasonable default for one campus building. Increase it if your campus is larger, or if GPS accuracy issues cause false rejections.</p>
+
+            <button type="submit">Save Settings</button>
+        </form>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/admin_settings.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+        body { font-family: Arial, sans-serif; background: #f4f6f8; margin: 0; padding: 2rem; }
+        .header { display: flex; justify-content: space-between; align-items: center;
+                   background: white; padding: 1rem 1.5rem; border-radius: 8px;
+                   box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 1.5rem; }
+        h1 { font-size: 1.1rem; margin: 0; color: #1a1a1a; }
+        .actions a, .actions button { color: #2563eb; text-decoration: none; font-size: 0.9rem;
+                        margin-left: 1rem; background: none; border: none; cursor: pointer; font-family: inherit; }
+        .note { background: #eff6ff; color: #1e40af; padding: 0.6rem 1rem; border-radius: 6px;
+                 font-size: 0.85rem; margin-bottom: 1rem; }
+        .table-wrap { overflow-x: auto; background: white; border-radius: 8px;
+                       box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        table { border-collapse: collapse; width: 100%; font-size: 0.8rem; white-space: nowrap; }
+        th, td { border: 1px solid #ddd; padding: 0.4rem 0.6rem; text-align: center; }
+        th { background: #1e3a8a; color: white; font-weight: 600; }
+        td.name-col, th.name-col { text-align: left; position: sticky; left: 0; background: white; }
+        th.name-col { background: #1e3a8a; }
+        .subject-group-header { background: #2563eb; }
+        .total-group { background: #f0fdf4; }
+        .total-group-header { background: #166534 !important; }
+        .pct-cell { font-weight: 600; }
+        .toggle-bar { margin-bottom: 1rem; }
+        .toggle-bar a { display: inline-block; padding: 0.5rem 1rem; margin-right: 0.5rem;
+                         background: white; border-radius: 6px; text-decoration: none;
+                         color: #2563eb; font-size: 0.85rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .toggle-bar a.active { background: #2563eb; color: white; }
+        .empty { color: #888; background: white; padding: 2rem; border-radius: 8px; text-align: center; }
+
+        @media print {
+            .toggle-bar { display: none; }
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .header .actions, .note { display: none; }
+            .header { box-shadow: none; border-bottom: 2px solid #000; border-radius: 0; }
+            .table-wrap { box-shadow: none; }
+            table { font-size: 9pt; }
+        }
+    

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Subjects</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_subjects.css') }}">
+</head>
+<body>
+    <div class="header">
+        <h1>Manage Subjects</h1>
+        <a class="back" href="/admin/dashboard">← Back to Dashboard</a>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for m in messages %}<div class="flash">{{ m }}</div>{% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card">
+        <h3>Add a New Subject</h3>
+        <form method="POST">
+            <input type="text" name="name" placeholder="e.g. Artificial Intelligence (Practical)" required style="width: 280px;">
+            <select name="class_id" required>
+                <option value="">Select class...</option>
+                {% for c in classes %}
+                <option value="{{ c.id }}">{{ c.name }}</option>
+                {% endfor %}
+            </select>
+            <select name="teacher_id" required>
+                <option value="">Select teacher...</option>
+                {% for t in teachers %}
+                <option value="{{ t.id }}">{{ t.name }} ({{ t.college_id }})</option>
+                {% endfor %}
+            </select>
+            <label style="font-size: 0.9rem; margin-right: 0.5rem;">
+                <input type="checkbox" name="is_practical" style="width: auto; margin-right: 0.3rem;">
+                This is a practical subject
+            </label>
+            <button type="submit">Add Subject</button>
+        </form>
+    </div>
+
+    <table>
+        <tr><th>Subject</th><th>Type</th><th>Class</th><th>Teacher</th><th>Sessions</th><th></th></tr>
+        {% for s in subjects %}
+        <tr>
+            <td>{{ s.name }}</td>
+            <td>{% if s.is_practical %}Practical{% else %}Theory{% endif %}</td>
+            <td>{{ s.class_name }}</td>
+            <td>{{ s.teacher_name }}</td>
+            <td>{{ s.session_count }}</td>
+            <td>
+                <form method="POST" action="/admin/subjects/{{ s.id }}/delete"
+                      onsubmit="return confirm('Delete {{ s.name }}? This will PERMANENTLY delete all {{ s.session_count }} QR session(s) and every attendance record tied to this subject. This cannot be undone.');">
+                    <button type="submit" style="background: #dc2626; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem;">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

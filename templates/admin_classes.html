@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Classes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_classes.css') }}">
+</head>
+<body>
+    <div class="header">
+        <h1>Manage Classes</h1>
+        <a class="back" href="/admin/dashboard">← Back to Dashboard</a>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for m in messages %}<div class="flash">{{ m }}</div>{% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card">
+        <h3>Add a New Class</h3>
+        <form method="POST">
+            <input type="text" name="name" placeholder="e.g. TYBSC Computer Science" required>
+            <input type="text" name="year" placeholder="e.g. 2025-26">
+            <button type="submit">Add Class</button>
+        </form>
+    </div>
+
+    <table>
+        <tr><th>ID</th><th>Class Name</th><th>Year</th><th>Subjects</th><th>Students</th><th>Class Head</th><th></th></tr>
+        {% for c in classes %}
+        <tr>
+            <td>{{ c.id }}</td>
+            <td>{{ c.name }}</td>
+            <td>{{ c.year or '—' }}</td>
+            <td>{{ c.subject_count }}</td>
+            <td>{{ c.student_count }}</td>
+            <td>
+                <form method="POST" action="/admin/classes/{{ c.id }}/set_head" style="display: flex; gap: 0.4rem;">
+                    <select name="head_teacher_id" onchange="this.form.submit()">
+                        <option value="">— None —</option>
+                        {% for t in teachers %}
+                        <option value="{{ t.id }}" {% if c.head_teacher_id == t.id %}selected{% endif %}>{{ t.name }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </td>
+            <td>
+                <form method="POST" action="/admin/classes/{{ c.id }}/delete"
+                      onsubmit="return confirm('Delete {{ c.name }}? This will PERMANENTLY delete all {{ c.subject_count }} subject(s), every QR session and attendance record tied to them, and unenroll {{ c.student_count }} student(s). This cannot be undone.');">
+                    <button type="submit" style="background: #dc2626;">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
