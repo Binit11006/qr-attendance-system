@@ -28,7 +28,7 @@ from datetime import datetime, timedelta
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 
-QR_VALID_SECONDS = 300  # how long each QR code stays scannable (5 minutes)
+QR_VALID_SECONDS = 30  # how long each QR code stays scannable (5 minutes)
 
 # Only used when the matching environment variable isn't set (local dev on your PC)
 DB_PASSWORD_FALLBACK = ""  # <-- put your local MySQL password here for local runs
