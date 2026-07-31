@@ -2,8 +2,12 @@
                display: flex; flex-direction: column; align-items: center; padding: 2rem; }
         .card { background: white; padding: 2rem; border-radius: 12px;
                  box-shadow: 0 4px 16px rgba(0,0,0,0.08); text-align: center; }
-        img { width: 280px; height: 280px; }
-        .timer { font-size: 1.1rem; margin-top: 1rem; color: #2563eb; font-weight: 600; }
+        img {
+            width: min(80vw, 80vh, 600px);
+            height: min(80vw, 80vh, 600px);
+            max-width: 100%;
+        }
+        .timer { font-size: 1.4rem; margin-top: 1rem; color: #2563eb; font-weight: 600; }
         .end-btn { margin-top: 1.5rem; background: #dc2626; color: white; border: none;
                     padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; }
         .end-btn:hover { background: #b91c1c; }
