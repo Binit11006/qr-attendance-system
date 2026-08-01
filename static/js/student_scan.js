@@ -90,14 +90,10 @@
             try {
                 trackCapabilities = html5QrCode.getRunningTrackCapabilities();
             } catch (e) {
-                showDebug("Zoom check failed: " + e.message);
                 return; // zoom not supported on this browser/device
             }
 
-            showDebug("Camera capabilities: " + JSON.stringify(trackCapabilities));
-
             if (!trackCapabilities || !trackCapabilities.zoom) {
-                showDebug("No 'zoom' property found on this device/browser's camera capabilities.");
                 return;
             }
 
@@ -116,18 +112,5 @@
                     advanced: [{ zoom: parseFloat(e.target.value) }],
                 }).catch(() => {});
             });
-        }
-
-        function showDebug(text) {
-            // TEMPORARY - remove once zoom support is confirmed working.
-            let debugBox = document.getElementById("debug-box");
-            if (!debugBox) {
-                debugBox = document.createElement("div");
-                debugBox.id = "debug-box";
-                debugBox.style.cssText = "margin-top:1rem;padding:0.6rem;background:#eee;" +
-                    "border-radius:6px;font-size:0.7rem;text-align:left;word-break:break-all;color:#333;";
-                document.querySelector(".card").appendChild(debugBox);
-            }
-            debugBox.textContent = text;
         }
     
