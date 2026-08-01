@@ -29,7 +29,7 @@ from datetime import datetime, timedelta
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 
-QR_VALID_SECONDS = 30  # how long each QR code stays scannable (30 seconds)
+QR_VALID_SECONDS = 45  # how long each QR code stays scannable (45 seconds)
 
 # Only used when the matching environment variable isn't set (local dev on your PC)
 DB_PASSWORD_FALLBACK = ""  # <-- put your local MySQL password here for local runs
@@ -457,7 +457,22 @@ def session_qr_image(session_id):
         return "Session not active", 404
 
     payload = json.dumps({"session_id": session_id, "token": row["qr_token"]})
-    img = qrcode.make(payload)
+
+    # Explicit settings instead of qrcode.make()'s defaults:
+    # - box_size=20: bigger native resolution, so scaling the image up on
+    #   screen (CSS displays it up to 600px) doesn't blur/soften the fine
+    #   detail of each module, which was likely making it slow/hard to scan.
+    # - error_correction=H: highest error correction level, most tolerant
+    #   of projector glare, motion blur, and imperfect camera angles when
+    #   scanning a QR off a screen rather than printed paper.
+    qr = qrcode.QRCode(
+        error_correction=qrcode.constants.ERROR_CORRECT_H,
+        box_size=20,
+        border=4,
+    )
+    qr.add_data(payload)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
 
     buf = io.BytesIO()
     img.save(buf, format="PNG")

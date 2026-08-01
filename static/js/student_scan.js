@@ -54,10 +54,20 @@
                 });
                 const data = await res.json();
                 showResult(data.message, data.status === "success");
+
+                if (data.status === "success") {
+                    // Attendance is marked - stop scanning entirely so the camera
+                    // doesn't keep re-reading the same on-screen QR and overwrite
+                    // this success message with a confusing "expired"/"already
+                    // marked" error a moment later.
+                    html5QrCode.stop().catch(() => {});
+                    return;
+                }
             } catch (e) {
                 showResult("Network error — try again.", false);
             } finally {
-                // allow scanning again after a short pause (covers wrong/expired QR retries)
+                // Only re-enable scanning if we didn't already succeed above
+                // (that path returns early and never reaches here).
                 setTimeout(() => { scanLocked = false; }, 2000);
             }
         }
