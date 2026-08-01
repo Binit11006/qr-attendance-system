@@ -18,6 +18,7 @@ Run locally:
 import os
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, Response
 import pymysql
+from dbutils.pooled_db import PooledDB
 from werkzeug.security import check_password_hash, generate_password_hash
 import qrcode
 import io
@@ -28,7 +29,7 @@ from datetime import datetime, timedelta
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 
-QR_VALID_SECONDS = 30  # how long each QR code stays scannable (1/2minutes)
+QR_VALID_SECONDS = 30  # how long each QR code stays scannable (30 seconds)
 
 # Only used when the matching environment variable isn't set (local dev on your PC)
 DB_PASSWORD_FALLBACK = ""  # <-- put your local MySQL password here for local runs
@@ -52,8 +53,33 @@ if DB_CONFIG["host"] != "localhost":
     DB_CONFIG["ssl"] = {"ssl": {}}
 
 
+# ------------------------------------------------------------------
+# Connection pooling
+#
+# Without this, every single page load/click opened a brand-new
+# connection to the database (fresh network handshake + SSL setup each
+# time), which adds real delay to every request. PooledDB keeps a small
+# set of connections open and hands them out/reclaims them as needed,
+# so most requests reuse an already-open connection instead of paying
+# that setup cost every time.
+#
+# get_db() is used the same way everywhere else in this file (still
+# call get_db() then conn.close() as before) - PooledDB makes .close()
+# return the connection to the pool instead of really closing it, so
+# no other code in this file needs to change.
+# ------------------------------------------------------------------
+_pool = PooledDB(
+    creator=pymysql,
+    maxconnections=8,   # upper limit on connections kept open at once
+    mincached=1,        # connections kept ready even when idle
+    maxcached=4,         # max idle connections kept in the pool
+    blocking=True,       # wait for a free connection instead of erroring out
+    **DB_CONFIG,
+)
+
+
 def get_db():
-    return pymysql.connect(**DB_CONFIG)
+    return _pool.connection()
 
 
 # ------------------------------------------------------------------
