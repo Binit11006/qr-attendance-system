@@ -10,4 +10,7 @@
         .location-status { font-size: 0.8rem; color: #888; margin-top: 0.6rem; }
         .location-status.ok { color: #166534; }
         .location-status.warn { color: #92660b; }
+        #zoom-control { margin-top: 0.8rem; display: flex; align-items: center;
+                         justify-content: center; gap: 0.6rem; font-size: 0.85rem; color: #444; }
+        #zoom-slider { width: 160px; }
     

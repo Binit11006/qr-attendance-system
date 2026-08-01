@@ -77,7 +77,40 @@
             { facingMode: "environment" },
             { fps: 10, qrbox: 220 },
             onScanSuccess
-        ).catch((err) => {
+        ).then(() => {
+            setupZoomControl();
+        }).catch((err) => {
             showResult("Couldn't access camera: " + err, false);
         });
+
+        function setupZoomControl() {
+            // Not every phone/browser exposes camera zoom - only show the
+            // slider if this device actually supports it.
+            let trackCapabilities;
+            try {
+                trackCapabilities = html5QrCode.getRunningTrackCapabilities();
+            } catch (e) {
+                return; // zoom not supported on this browser/device
+            }
+
+            if (!trackCapabilities || !trackCapabilities.zoom) {
+                return;
+            }
+
+            const zoomControl = document.getElementById("zoom-control");
+            const zoomSlider = document.getElementById("zoom-slider");
+            const zoomRange = trackCapabilities.zoom;
+
+            zoomSlider.min = zoomRange.min;
+            zoomSlider.max = zoomRange.max;
+            zoomSlider.step = zoomRange.step || 0.1;
+            zoomSlider.value = zoomRange.min;
+            zoomControl.style.display = "flex";
+
+            zoomSlider.addEventListener("input", (e) => {
+                html5QrCode.applyVideoConstraints({
+                    advanced: [{ zoom: parseFloat(e.target.value) }],
+                }).catch(() => {});
+            });
+        }
     
