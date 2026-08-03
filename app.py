@@ -318,10 +318,11 @@ def mark_attendance():
                     }), 403
 
             # 3. Mark attendance (unique constraint blocks double-marking)
+            device_id = data.get("device_id")
             try:
                 cur.execute(
-                    "INSERT INTO attendance (session_id, student_id) VALUES (%s, %s)",
-                    (session_id, student_id),
+                    "INSERT INTO attendance (session_id, student_id, device_id) VALUES (%s, %s, %s)",
+                    (session_id, student_id, device_id),
                 )
                 conn.commit()
             except pymysql.err.IntegrityError:
@@ -1226,6 +1227,43 @@ def export_attendance_csv():
         mimetype="text/csv",
         headers={"Content-Disposition": "attachment; filename=attendance_report.csv"},
     )
+
+
+# ------------------------------------------------------------------
+# Device-sharing report: flags devices used to mark attendance for more
+# than one distinct student. A strong signal of possible proxy attendance
+# (one student marking present for an absent friend, using their account
+# on the same phone) - but NOT proof by itself. Browser-level ID, easily
+# reset by clearing browser data/Incognito, so treat results as "worth
+# asking the students about", not automatic guilt.
+# ------------------------------------------------------------------
+@app.route("/admin/device-report")
+def device_report():
+    if session.get("role") != "admin":
+        return redirect(url_for("login"))
+
+    conn = get_db()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                """SELECT a.device_id,
+                          GROUP_CONCAT(DISTINCT CONCAT(u.name, ' (roll ', COALESCE(u.roll_no, '?'), ')')
+                                       ORDER BY u.name SEPARATOR ', ') AS students,
+                          COUNT(DISTINCT a.student_id) AS student_count,
+                          MIN(a.marked_at) AS first_seen,
+                          MAX(a.marked_at) AS last_seen
+                   FROM attendance a
+                   JOIN users u ON u.id = a.student_id
+                   WHERE a.device_id IS NOT NULL
+                   GROUP BY a.device_id
+                   HAVING student_count > 1
+                   ORDER BY student_count DESC, last_seen DESC"""
+            )
+            flagged = cur.fetchall()
+    finally:
+        conn.close()
+
+    return render_template("admin_device_report.html", flagged=flagged)
 
 
 if __name__ == "__main__":

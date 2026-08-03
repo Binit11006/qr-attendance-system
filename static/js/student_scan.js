@@ -4,6 +4,23 @@
         let currentLat = null;
         let currentLng = null;
 
+        function getDeviceId() {
+            // A random ID stored in this browser, used only to notice if the
+            // same phone marks attendance for two different student
+            // accounts (a signal of possible proxy attendance). Not tied to
+            // hardware - clearing browser data or using a different browser/
+            // Incognito mode generates a new one.
+            let deviceId = localStorage.getItem("attendance_device_id");
+            if (!deviceId) {
+                deviceId = crypto.randomUUID
+                    ? crypto.randomUUID()
+                    : "dev-" + Date.now() + "-" + Math.random().toString(36).slice(2);
+                localStorage.setItem("attendance_device_id", deviceId);
+            }
+            return deviceId;
+        }
+        const deviceId = getDeviceId();
+
         function requestLocation() {
             if (!navigator.geolocation) {
                 locationStatus.textContent = "⚠️ Your browser doesn't support location — attendance may be rejected if location is required.";
@@ -44,6 +61,7 @@
 
             payload.lat = currentLat;
             payload.lng = currentLng;
+            payload.device_id = deviceId;
 
             scanLocked = true;
             try {

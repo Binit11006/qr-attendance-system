@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Sharing Report</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_defaulters.css') }}">
+</head>
+<body>
+    <div class="header">
+        <h1>Device Sharing Report</h1>
+        <a class="back" href="/admin/dashboard">← Back to Dashboard</a>
+    </div>
+
+    <div class="filter-card" style="text-align: left; padding: 1rem 1.2rem;">
+        <p style="margin: 0; color: #555; font-size: 0.9rem; line-height: 1.5;">
+            ⚠️ This flags a phone/browser that has marked attendance for <strong>more than one</strong>
+            student account — a possible sign of proxy attendance (one student marking present for an
+            absent friend, using their account on the same device).<br><br>
+            <strong>This is not proof by itself.</strong> Innocent explanations exist (a student
+            genuinely borrowing a friend's phone while both are present, shared family devices, etc.).
+            Treat this as a starting point for a conversation, not an automatic accusation. It also
+            only catches sharing on the <em>same</em> device — someone using a separate phone won't show up here.
+        </p>
+    </div>
+
+    {% if flagged %}
+    <table>
+        <tr>
+            <th>Students on this device</th><th># Accounts</th><th>First seen</th><th>Last seen</th>
+        </tr>
+        {% for f in flagged %}
+        <tr>
+            <td>{{ f.students }}</td>
+            <td class="pct">{{ f.student_count }}</td>
+            <td>{{ f.first_seen }}</td>
+            <td>{{ f.last_seen }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <div class="empty">No devices flagged — no single phone/browser has marked attendance for more than one student account.</div>
+    {% endif %}
+</body>
+</html>
