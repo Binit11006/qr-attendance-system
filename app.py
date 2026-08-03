@@ -176,8 +176,11 @@ def student_dashboard():
                           COUNT(DISTINCT se.id) AS total_sessions,
                           COUNT(DISTINCT a.session_id) AS attended
                    FROM student_class sc
+                   JOIN users me ON me.id = sc.student_id
                    JOIN subjects sub ON sub.class_id = sc.class_id
                    LEFT JOIN sessions se ON se.subject_id = sub.id
+                          AND (se.batch_min_roll IS NULL
+                               OR me.roll_no BETWEEN se.batch_min_roll AND se.batch_max_roll)
                    LEFT JOIN attendance a
                           ON a.session_id = se.id AND a.student_id = %s
                    WHERE sc.student_id = %s
@@ -289,6 +292,31 @@ def mark_attendance():
             if not cur.fetchone():
                 return jsonify({"status": "error", "message": "You're not enrolled in this class."}), 403
 
+            # 2b. If this specific session is restricted to a batch (roll
+            # number range) - e.g. two practicals running at the same time
+            # in different labs, each for half the class - reject students
+            # outside that range so they can't accidentally (or on purpose)
+            # get marked present for a practical they're not actually in.
+            # This is set per-session (by the teacher, when starting it),
+            # not permanently per-subject, since which batch does which
+            # practical rotates according to the timetable.
+            if sess["batch_min_roll"] is not None and sess["batch_max_roll"] is not None:
+                cur.execute("SELECT roll_no FROM users WHERE id=%s", (student_id,))
+                student_row = cur.fetchone()
+                student_roll = student_row["roll_no"] if student_row else None
+
+                if student_roll is None:
+                    return jsonify({
+                        "status": "error",
+                        "message": "Your roll number isn't set - ask your teacher/admin to fix this before you can mark attendance for this practical.",
+                    }), 403
+
+                if not (sess["batch_min_roll"] <= student_roll <= sess["batch_max_roll"]):
+                    return jsonify({
+                        "status": "error",
+                        "message": f"This session is for roll numbers {sess['batch_min_roll']}-{sess['batch_max_roll']}. You're in a different batch.",
+                    }), 403
+
             # 3. Mark attendance (unique constraint blocks double-marking)
             try:
                 cur.execute(
@@ -375,6 +403,18 @@ def start_session():
         flash("Please select a subject before generating a QR code.")
         return redirect(url_for("teacher_dashboard"))
 
+    # Which batch is attending this specific session, if any. "all" (or
+    # anything else unrecognized) means no restriction - every enrolled
+    # student can scan. This is chosen fresh each time a session starts,
+    # since which batch does which practical changes according to the
+    # timetable, not fixed permanently per subject.
+    batch_choice = request.form.get("batch", "all")
+    batch_ranges = {
+        "1": (1, 30),
+        "2": (31, 60),
+    }
+    batch_min_roll, batch_max_roll = batch_ranges.get(batch_choice, (None, None))
+
     token = secrets.token_urlsafe(16)
     expires_at = datetime.now() + timedelta(seconds=QR_VALID_SECONDS)
 
@@ -395,9 +435,10 @@ def start_session():
 
             cur.execute(
                 """INSERT INTO sessions
-                   (subject_id, teacher_id, session_date, start_time, qr_token, qr_expires_at, is_active)
-                   VALUES (%s, %s, CURDATE(), NOW(), %s, %s, 1)""",
-                (subject_id, session["user_id"], token, expires_at),
+                   (subject_id, teacher_id, session_date, start_time, qr_token, qr_expires_at,
+                    is_active, batch_min_roll, batch_max_roll)
+                   VALUES (%s, %s, CURDATE(), NOW(), %s, %s, 1, %s, %s)""",
+                (subject_id, session["user_id"], token, expires_at, batch_min_roll, batch_max_roll),
             )
             conn.commit()
             new_id = cur.lastrowid
@@ -611,6 +652,8 @@ def _build_class_report(class_id, teacher_id, view):
                    JOIN users u ON u.id = sc.student_id
                    JOIN subjects sub ON sub.class_id = sc.class_id
                    LEFT JOIN sessions se ON se.subject_id = sub.id
+                          AND (se.batch_min_roll IS NULL
+                               OR u.roll_no BETWEEN se.batch_min_roll AND se.batch_max_roll)
                    LEFT JOIN attendance a
                           ON a.session_id = se.id AND a.student_id = u.id
                    WHERE sc.class_id = %s
@@ -1112,6 +1155,8 @@ def admin_defaulters():
                    JOIN subjects sub ON sub.class_id = sc.class_id
                    JOIN classes c ON c.id = sc.class_id
                    LEFT JOIN sessions se ON se.subject_id = sub.id
+                          AND (se.batch_min_roll IS NULL
+                               OR u.roll_no BETWEEN se.batch_min_roll AND se.batch_max_roll)
                    LEFT JOIN attendance a
                           ON a.session_id = se.id AND a.student_id = u.id
                    {where_sql}
@@ -1157,6 +1202,8 @@ def export_attendance_csv():
                    JOIN subjects sub ON sub.class_id = sc.class_id
                    JOIN classes c ON c.id = sc.class_id
                    LEFT JOIN sessions se ON se.subject_id = sub.id
+                          AND (se.batch_min_roll IS NULL
+                               OR u.roll_no BETWEEN se.batch_min_roll AND se.batch_max_roll)
                    LEFT JOIN attendance a
                           ON a.session_id = se.id AND a.student_id = u.id
                    GROUP BY u.id, u.college_id, u.name, u.roll_no, c.name, sub.id, sub.name
