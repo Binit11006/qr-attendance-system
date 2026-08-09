@@ -97,7 +97,7 @@ def home():
 def login():
     if request.method == "POST":
         college_id = request.form.get("college_id", "").strip()
-        password = request.form.get("password", "")
+        password = request.form.get("password", "").strip()
 
         conn = get_db()
         try:
